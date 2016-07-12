@@ -10,7 +10,7 @@ maintainer:          kwangyul.seo@gmail.com
 copyright:           BSD3
 category:            XML
 build-type:          Simple
--- extra-source-files:
+extra-source-files:  README.md
 cabal-version:       >=1.10
 
 library
