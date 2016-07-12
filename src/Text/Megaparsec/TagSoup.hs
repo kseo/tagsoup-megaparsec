@@ -49,7 +49,7 @@ updatePosTag :: Int         -- ^ Tab width
              -> SourcePos   -- ^ Initial position
              -> (Tag str)   -- ^ Tag at the position
              -> SourcePos
-updatePosTag width sourcePos tag = incSourceColumn sourcePos 1
+updatePosTag _ sourcePos _ = incSourceColumn sourcePos 1
 
 -- | Parses a text block containing only characters which satisfy 'isSpace'.
 space :: (Show str, StringLike str, MonadParsec s m (Tag str)) => m (Tag str)
