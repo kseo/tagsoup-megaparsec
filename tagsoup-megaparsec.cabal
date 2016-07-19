@@ -10,6 +10,7 @@ maintainer:          kwangyul.seo@gmail.com
 copyright:           BSD3
 category:            XML
 build-type:          Simple
+tested-with:         GHC == 7.10.1, GHC == 8.0.1
 extra-source-files:  README.md
 cabal-version:       >=1.10
 
