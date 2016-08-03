@@ -1,5 +1,6 @@
 # tagsoup-megaparsec
 
+[![Hackage](https://img.shields.io/hackage/v/tagsoup-megaparsec.svg?style=flat)](https://hackage.haskell.org/package/tagsoup-megaparsec)
 [![Build Status](https://travis-ci.org/kseo/tagsoup-megaparsec.svg?branch=master)](https://travis-ci.org/kseo/tagsoup-megaparsec)
 
 A Tag token parser and Tag specific parsing combinators, inspired by [parsec-tagsoup][parsec-tagsoup] and [tagsoup-parsec][tagsoup-parsec]. This library helps you build a megaparsec parser using TagSoup's Tag as tokens.
