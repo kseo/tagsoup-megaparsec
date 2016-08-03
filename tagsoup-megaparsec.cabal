@@ -1,5 +1,5 @@
 name:                tagsoup-megaparsec
-version:             0.1.0.0
+version:             0.2.0.0
 synopsis:            A Tag token parser and Tag specific parsing combinators
 description:         Please see README.md
 homepage:            https://github.com/kseo/tagsoup-megaparsec#readme
@@ -12,6 +12,7 @@ category:            XML
 build-type:          Simple
 tested-with:         GHC == 7.10.1, GHC == 8.0.1
 extra-source-files:  README.md
+                   , CHANGELOG.md
 cabal-version:       >=1.10
 
 flag pedantic
@@ -21,9 +22,14 @@ flag pedantic
 library
   hs-source-dirs:      src
   exposed-modules:     Text.Megaparsec.TagSoup
-  build-depends:       base >= 4.7 && < 5
-                     , megaparsec >= 4.4 && < 5
-                     , tagsoup >= 0.13 && < 0.15
+  build-depends:       base         >= 4.7   && < 5
+                     , containers   >= 0.5   && < 0.6
+                     , megaparsec   >= 5.0.1 && < 6
+                     , tagsoup      >= 0.13  && < 0.15
+  if !impl(ghc >= 8.0)
+    -- packages providing modules that moved into base-4.9.0.0
+    build-depends:     semigroups   == 0.18.*
+
   ghc-options:         -Wall
   if flag(pedantic)
      ghc-options:      -Werror
