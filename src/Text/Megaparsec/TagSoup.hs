@@ -33,6 +33,7 @@ import Data.Semigroup ((<>))
 import qualified Data.Set as Set
 import Text.HTML.TagSoup
 import Text.StringLike
+import Text.Megaparsec ((<|>))
 import Text.Megaparsec.Combinator
 import Text.Megaparsec.Error
 import Text.Megaparsec.Pos
@@ -71,9 +72,16 @@ space = satisfy (\tag -> case tag of
                            TagText x | all isSpace (toString x) -> True
                            _ -> False)
 
--- | Parses any whitespace. Whitespace consists of zero or more ocurrences of 'space'.
+-- | Parses a comment.
+comment :: (StringLike str, MonadParsec e s m, Token s ~ Tag str) => m (Tag str)
+comment = satisfy (\tag -> case tag of
+                             TagComment _ -> True
+                             _ -> False)
+
+-- | Parses any whitespace. Whitespace consists of zero or more
+-- ocurrences of 'space' or 'comment'.
 whitespace :: (StringLike str, MonadParsec e s m, Token s ~ Tag str) => m ()
-whitespace = skipMany space
+whitespace = skipMany (space <|> comment)
 
 -- | @lexeme p@ first applies parser @p@ and then 'whitespace', returning the value of @p@.
 --
