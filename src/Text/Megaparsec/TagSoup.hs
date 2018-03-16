@@ -103,12 +103,12 @@ satisfy f = lexeme $ token testTag Nothing
 -- | Parse any opening tag.
 -- As all the tag parsers, it consumes the whitespace immediately after the parsed tag.
 anyTagOpen :: (StringLike str, MonadParsec e s m, Token s ~ Tag str) => m (Tag str)
-anyTagOpen = satisfy isTagOpen <?> "any tag open"
+anyTagOpen = satisfy isTagOpen <?> "any TagOpen"
 
 -- | Parse any closing tag.
 -- As all the tag parsers, it consumes the whitespace immediately after the parsed tag.
 anyTagClose :: (StringLike str, MonadParsec e s m, Token s ~ Tag str) => m (Tag str)
-anyTagClose = satisfy isTagClose <?> "any tag close"
+anyTagClose = satisfy isTagClose <?> "any TagClose"
 
 -- | Parses a chunk of text.
 -- As all the tag parsers, it consumes the whitespace immediately after the parsed tag.
@@ -118,9 +118,9 @@ tagText = satisfy isTagText <?> "text"
 -- | Parse the given opening tag.
 -- As all the tag parsers, these consume the whitespace immediately after the parsed tag.
 tagOpen :: (StringLike str, MonadParsec e s m, Token s ~ Tag str) => str -> m (Tag str)
-tagOpen s = satisfy (isTagOpenName s) <?> "tag open"
+tagOpen s = satisfy (isTagOpenName s) <?> ("TagOpen " ++ s)
 
 -- | Parse the given closing tag.
 -- As all the tag parsers, these consume the whitespace immediately after the parsed tag.
 tagClose :: (StringLike str, MonadParsec e s m, Token s ~ Tag str) => str -> m (Tag str)
-tagClose s = satisfy (isTagCloseName s) <?> "tag close"
+tagClose s = satisfy (isTagCloseName s) <?> ("TagClose " ++ s)
