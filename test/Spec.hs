@@ -1,11 +1,12 @@
 {-# LANGUAGE QuasiQuotes #-}
+import Data.Void
 import Test.Hspec
 import Text.RawString.QQ
 import Text.HTML.TagSoup
 import Text.Megaparsec
 import Text.Megaparsec.TagSoup
 
-type StringTagParser = TagParser String
+type StringTagParser = TagParser Void String
 
 testDoc = [r|
 <ul>
