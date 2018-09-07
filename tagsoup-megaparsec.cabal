@@ -24,8 +24,8 @@ library
   hs-source-dirs:      src
   exposed-modules:     Text.Megaparsec.TagSoup
   build-depends:       base         >= 4.7   && < 5
-                     , containers   >= 0.5   && < 0.6
-                     , megaparsec   >= 5.0.1 && < 6
+                     , containers   >= 0.5   && < 0.7
+                     , megaparsec   >= 5.0.1 && < 8
                      , tagsoup      >= 0.13  && < 0.15
   if !impl(ghc >= 8.0)
     -- packages providing modules that moved into base-4.9.0.0
