@@ -11,6 +11,7 @@ type StringTagParser = TagParser Void String
 testDoc = [r|
 <ul>
 <li>Item 1</li>
+<!-- comments are ignored -->
 <li>Item 2</li>
 </ul>
 |]

@@ -4,6 +4,7 @@
 {-# LANGUAGE NamedFieldPuns      #-}
 {-# LANGUAGE RecordWildCards     #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE LambdaCase          #-}
 -- |
 -- Module      :  Text.Megaparsec.TagSoup
 -- Copyright   :  © 2016 Kwang Yul Seo
@@ -43,10 +44,6 @@ import Text.Megaparsec
 -- @Parser@ type and easily change it by importing different “type
 -- modules”. This one is for TagSoup tags.
 type TagParser e str = Parsec e [Tag str]
-{-
-instance (Show str) => ShowToken (Tag str) where
-    showTokens tags = unwords (NE.toList (NE.map show tags))
--}
 
 incPos :: Pos -> Pos
 incPos = (pos1 <>)
@@ -64,34 +61,34 @@ instance forall str. (Ord str, Show str) => Stream [Tag str] where
   take1_ (x:xs) = Just (x, xs)
   takeN_ i s
     | i <= 0 = Just ([], s)
-    | s == [] = Nothing
+    | null s = Nothing
     | otherwise = Just (take i s, drop i s)
-  takeWhile_ f s = takeWhile' [] s where
+  takeWhile_ f = takeWhile' [] where
     takeWhile' ys [] = (ys, [])
     takeWhile' ys (x:xs)
       | f x = takeWhile' (x:ys) xs
       | otherwise = (ys, x:xs)
-  showTokens _ ne = show ne
+  showTokens _ = show
   reachOffset i state = reachOffset' i state [] where
     replaceEmpty "" = "<empty line>"
     replaceEmpty x = x
     reachOffset' :: Int -> PosState [Tag str] -> [String] -> (SourcePos, String, PosState [Tag str])
     reachOffset' j s' strs
       | j <= 0 = (pstateSourcePos s', replaceEmpty (fold (reverse strs)), s')
-      | otherwise = let str = case (pstateInput s') of
+      | otherwise = let str = case pstateInput s' of
                                 [] -> ""
                                 (x:_) -> show x
                     in reachOffset' (j - 1) (incState state) (str:strs) where
-          incState (PosState {..}) = let (SourcePos {..}) = pstateSourcePos
-                                         nspos = SourcePos { sourceColumn = incPos sourceColumn, .. }
+          incState PosState {..} = let SourcePos {..} = pstateSourcePos
+                                       nspos = SourcePos { sourceColumn = incPos sourceColumn, .. }
                                      in
-            PosState { pstateOffset = (pstateOffset + 1), pstateSourcePos = nspos, .. }
+            PosState { pstateOffset = pstateOffset + 1, pstateSourcePos = nspos, .. }
 
 -- | Parses a text block containing only characters which satisfy 'isSpace'.
 space :: (StringLike str, MonadParsec e s m, Token s ~ Tag str) => m (Tag str)
-space = satisfy (\tag -> case tag of
-                           TagText x | all isSpace (toString x) -> True
-                           _ -> False)
+space = satisfy (\case TagText x | all isSpace (toString x) -> True
+                       TagComment _ -> True
+                       _ -> False)
 
 -- | Parses any whitespace. Whitespace consists of zero or more ocurrences of 'space'.
 whitespace :: (StringLike str, MonadParsec e s m, Token s ~ Tag str) => m ()
@@ -115,36 +112,28 @@ anyTag :: (StringLike str, MonadParsec e s m, Token s ~ Tag str) => m (Tag str)
 anyTag = lexeme $ token Just S.empty -- Passing "Just" means the parser will always
                                      -- succeed so it does not matter what the set is.
 
-{-
--- | Parse a tag if it satisfies the predicate.
--- As all the tag parsers, it consumes the whitespace immediately after the parsed tag.
-satisfy :: (StringLike str, MonadParsec e s m, Token s ~ Tag str) => (Tag str -> Bool) -> m (Tag str)
-satisfy f = lexeme $ token testTag Nothing
-  where testTag x = if f x
-                       then Right x
-                       else Left (Set.singleton (Tokens (x:|[])), Set.empty, Set.empty)
--}
 -- | Parse any opening tag.
 -- As all the tag parsers, it consumes the whitespace immediately after the parsed tag.
 anyTagOpen :: (StringLike str, MonadParsec e s m, Token s ~ Tag str) => m (Tag str)
-anyTagOpen = lexeme (satisfy isTagOpen <?> "any tag open")
+anyTagOpen = lexeme (satisfy isTagOpen <?> "TagOpen")
 
 -- | Parse any closing tag.
 -- As all the tag parsers, it consumes the whitespace immediately after the parsed tag.
 anyTagClose :: (StringLike str, MonadParsec e s m, Token s ~ Tag str) => m (Tag str)
-anyTagClose = lexeme (satisfy isTagClose <?> "any tag close")
+anyTagClose = lexeme (satisfy isTagClose <?> "TagClose")
 
 -- | Parses a chunk of text.
 -- As all the tag parsers, it consumes the whitespace immediately after the parsed tag.
 tagText :: (StringLike str, MonadParsec e s m, Token s ~ Tag str) => m (Tag str)
-tagText = lexeme (satisfy isTagText <?> "text")
+tagText = lexeme (satisfy isTagText <?> "TagText")
 
 -- | Parse the given opening tag.
 -- As all the tag parsers, these consume the whitespace immediately after the parsed tag.
 tagOpen :: (StringLike str, MonadParsec e s m, Token s ~ Tag str) => str -> m (Tag str)
-tagOpen s = lexeme (satisfy (isTagOpenName s) <?> "tag open")
+tagOpen s = lexeme (satisfy (isTagOpenName s) <?> "TagOpen " ++ (toString s))
 
 -- | Parse the given closing tag.
 -- As all the tag parsers, these consume the whitespace immediately after the parsed tag.
 tagClose :: (StringLike str, MonadParsec e s m, Token s ~ Tag str) => str -> m (Tag str)
-tagClose s = lexeme (satisfy (isTagCloseName s) <?> "tag close")
+tagClose s = lexeme (satisfy (isTagCloseName s) <?> "TagClose " ++ (toString s))
+
