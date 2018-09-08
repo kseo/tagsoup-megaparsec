@@ -28,6 +28,7 @@ library
                      , megaparsec   >= 7.0  && < 8.0
                      , tagsoup      >= 0.13 && < 0.15
                      , parser-combinators >= 1.0 && < 2.0
+
   if !impl(ghc >= 8.0)
     -- packages providing modules that moved into base-4.9.0.0
     build-depends:     semigroups   == 0.18.*
